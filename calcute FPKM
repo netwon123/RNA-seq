@@ -1,3 +1,10 @@
+cat PR1 | cut -f 1,7 > PR1.count
+paste PR1.count PR2.count PR3.count SR1.count SR2.count SR3.count > countstable           
+#合并不同样本的定量信息到一个文件
+
+awk '{$3="";$5="";$7="";$9="";$11="";print $0}' countstable > RNA-Seq_Practice_countstable     
+#提取指定列到新文件
+
 setwd('G:/博士/')
 df <- read.table("RNA-Seq_Practice_countstable") #读入数据文件
 rownames(df) <- df$V1
