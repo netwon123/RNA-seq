@@ -1,0 +1,22 @@
+setwd('G:/博士/')
+df <- read.table("RNA-Seq_Practice_countstable") #读入数据文件
+rownames(df) <- df$V1
+df <- df[,c(2,3,4,5,6,7,8)]
+colnames(df)<-c('len','FH1','FH2','X1','X2','Y1','Y2')
+
+
+
+featureCounts_meta <- df[,1]  #提取基因信息
+df_count<-df[,2:7]
+prefix <-"RNA_3sample_2repeat"   #设置输出文件前缀名
+
+
+
+
+kb <- featureCounts_meta/ 1000
+rpk <- df_count / kb
+tpm <- t(t(rpk)/colSums(rpk) * 1000000)
+
+
+fpkm <- t(t(rpk)/colSums(df_count) * 10^6)
+write.table(fpkm,file= paste0(prefix, "_fpkm.xls"), quote=F, sep="\t", row.names=T, col.names=T )
