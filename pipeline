@@ -1,0 +1,22 @@
+#hisat2-build -p 8 ~/assembly_pacbio/Duroc/Duroc.fa ~/assembly_pacbio/Duroc/duroc_dna
+
+fastqc -t 16 *.fq -o ./qc
+
+ls ./*fq.gz | while read i;
+do
+i=${i/_1.fq.gz/}
+fastp -w 56 -L -i ${i}_1.fq.gz -o ${i}_1_clean.fq.gz -I ${i}_2.fq.gz -O ${i}_2_clean.fq.gz
+done
+
+ls *_1_clean.fq.gz | while read i;
+do
+i=${i/_1_clean.fq.gz/}
+hisat2 -p 16 \
+-x  ~/assembly_pacbio/Duroc/duroc_dna \
+-1  ${i}_1_clean.fq.gz \
+-2  ${i}_2_clean.fq.gz \
+-S  ${i}.sam --new-summary 1>${i}_hisat2Mapping.log
+done
+ls *sam | while read id; do samtools view -@ 20 -bS $id | /public/home/baoqi/software/samtools-1.9/samtools sort -@ 20 -o ${id}.sorted.bam;done
+ls *bam | while read id; do /public/home/baoqi/software/subread-2.0.6-Linux-x86_64/bin/featureCounts -a /public/home/baoqi/GCF_000003025.6_Sscrofa11.1_genomic.gtf -T 16 -p  --countReadPairs -g gene_id -t exon -o ${id}.count $id; done
+
