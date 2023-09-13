@@ -3,15 +3,14 @@ library(reshape2)
 library(stringr)
 setwd('G:/')
 enableWGCNAThreads(nThreads = 0.75*parallel::detectCores())
+#--------------------------------loading the file--------------------------------
 combat_edata_l=read.csv('df_rm.csv',header = T,row.names = 1,quote="", comment="", check.names=F)
 m.vars=apply(combat_edata_l,1,var)
 expro.upper=combat_edata_l[which(m.vars>quantile(m.vars, probs = seq(0, 1, 0.25))[2]),]
-
-dim(expro.upper)
+#dim(expro.upper)
 datExpr0=as.data.frame(t(expro.upper))
 gsg = goodSamplesGenes(datExpr0, verbose = 3);
 gsg$allOK
-
 
 if (!gsg$allOK)
 {
@@ -28,14 +27,87 @@ if (!gsg$allOK)
 dim(datExpr0)
 datExpr=datExpr0
 
-
 datTraits = read.csv('trait.csv',sep = ',',row.names=1,header=T)
 
+#-------------------------get the power -----------------------------
+
+k=softConnectivity(datE=datExpr,power=16)
+datTraits = read.csv('trait.csv',sep = ',',row.names=1,header=T)
+power=16
+sizeGrWindow(5,10)
+pdf(file = 'connenct.pdf')
+par(mfrow=c(1,2))
+hist(k)
+scaleFreePlot(k, main="Check scale free topology\n")
+dev.off()
+
+
+#--------------------------Gene clustering on TOM-based dissimilarity-------------------------------
+
+softPower = 16;
+adjacency = adjacency(datExpr, power = softPower)
+TOM = TOMsimilarity(adjacency);#计算时间很⻓长，公式⽐比较复杂
+dissTOM = 1-TOM
+
+geneTree = hclust(as.dist(dissTOM), method = "average");
+# Plot the resulting clustering tree (dendrogram)
+sizeGrWindow(12,12)
+plot(geneTree, xlab="", sub="", main = "Gene clustering on TOM-based
+dissimilarity",labels = FALSE, hang = 0.04)
+minModuleSize = 30;
+# Module identification using dynamic tree cut:
+dynamicMods = cutreeDynamic(dendro = geneTree, distM = dissTOM,
+                            deepSplit = 2, pamRespectsDendro =FALSE,minClusterSize = minModuleSize)
+table(dynamicMods)
+dynamicColors = labels2colors(dynamicMods)
+table(dynamicColors)
+sizeGrWindow(8,12)
+plotDendroAndColors(geneTree, dynamicColors, "Dynamic Tree Cut",
+                    dendroLabels = FALSE, hang = 0.03,
+                    addGuide = TRUE, guideHang = 0.05,
+                    main = "Gene dendrogram and module colors")
+MEList = moduleEigengenes(datExpr, colors = dynamicColors)
+MEs = MEList$eigengenes#MEs
+# Calculate dissimilarity of module eigengenes
+MEDiss = 1-cor(MEs);
+# Cluster module eigengenes
+METree = hclust(as.dist(MEDiss), method = "average");
+# Plot the result
+sizeGrWindow(7, 6)
+plot(METree, main = "Clustering of module eigengenes",
+     xlab = "", sub = "")
+MEDissThres = 0.25
+# abline=0.25
+abline(h=MEDissThres, col = "red")
+merge = mergeCloseModules(datExpr, dynamicColors, cutHeight =
+                            MEDissThres, verbose = 3)
+# The merged module colors
+mergedColors = merge$colors;
+# Eigengenes of the new merged modules:
+mergedMEs = merge$newMEs;
+# get the new tree
+sizeGrWindow(12, 9)
+#pdf(file = "geneDendro-3.pdf", wi = 9, he = 6)
+plotDendroAndColors(geneTree, cbind(dynamicColors, mergedColors),
+                    c("Dynamic Tree Cut", "Merged dynamic"),
+                    dendroLabels = FALSE, hang = 0.03,
+                    addGuide = TRUE, guideHang = 0.05)
+#dev.off()
+
+#----------------------save the first step data------------------------
+# Rename to moduleColors
+moduleColors = mergedColors
+# add the color of grey module
+colorOrder = c("grep", standardColors(50));
+moduleLabels = match(moduleColors, colorOrder)-1;
+MEs = mergedMEs;
+save(MEs,moduleLabels,moduleColors,geneTree,file='G-02-network.Rdata')
+
 load(file = "G-02-network.Rdata")
-nGenes = ncol(datExpr);#定义基因和样本的数量量
+nGenes = ncol(datExpr);
 nSamples = nrow(datExpr)
 
-
+#-----------------------module vs trait-------------------------------------
 if(T){
   datTraits$group <- as.factor(datTraits$group)
   design <- model.matrix(~0+datTraits$group)
@@ -51,7 +123,7 @@ if(T){
   pdf("step4_Module-trait-relationship_heatmap.pdf",
       width = 2*length(colnames(design)),
       height = 0.6*length(names(MEs)) )
-  par(mar=c(5, 9, 3, 3)) #留白：下、左、上、右
+  par(mar=c(5, 9, 3, 3)) 
   labeledHeatmap(Matrix = moduleTraitCor,
                  xLabels = colnames(design),
                  yLabels = names(MEs),
@@ -64,7 +136,7 @@ if(T){
                  zlim = c(-1,1),
                  main = "Module-trait relationships")
   dev.off()
-  save(design, file = "step4_design.Rdata")
+  save(design, file = "design.Rdata")
 }
 if(T){
   mes_group <- merge(MEs,datTraits,by='row.names')
@@ -88,10 +160,12 @@ if(T){
   do.call(grid.arrange,c(p,ncol=2)) #排布为每行2个
   dev.off()
 }
-#-----------------------------
+
+
+
+#-----------------------------module vs gene---------------------------------------------------
 levels(datTraits$group)
 choose_group <- "Y1"  
-
 
 if(T){
   modNames <- substring(names(MEs), 3)
@@ -158,7 +232,8 @@ if(T){
                         xLabelsAngle = 90)
   dev.off()
 }
-#-----------------------------
+
+#-----------------------------get the expression heatmap of interesting module------------------------------
 module = "floralwhite"
 if(T){
   dat=datExpr[,moduleColors==module]
@@ -189,7 +264,7 @@ if(T){
 
 
 
-#--------------------------------------------------------------------------------------
+#----------------------------get the hub gene of interesting module (top 100)----------------------------------------------------------
 module = "blue"
 if(T){
   ### 提取感兴趣模块基因名
@@ -210,7 +285,7 @@ if(T){
   
 
 
-  # for cytoscape
+  # ---------------------get the input filte of cytoscape------------------------------------------
   cyt <- exportNetworkToCytoscape(filter_modTOM,
                                   edgeFile = paste("step8_CytoscapeInput-edges-", paste(module, collapse="-"), ".txt", sep=""),
                                   nodeFile = paste("step8_CytoscapeInput-nodes-", paste(module, collapse="-"), ".txt", sep=""),
