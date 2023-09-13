@@ -1,0 +1,30 @@
+#using removeBatchEffect function in R package limma
+library(limma)
+library(bladderbatch)
+library(ggfortify)
+
+#pca of raw count
+expro3=read.csv('ttt.csv',sep=",",row.names=1,header=T,check.names=F,quote="!")
+out_pca <- prcomp(expro3[,-1])
+plot(out_pca,type="l")
+autoplot(out_pca,data=expro3,colour='type',size=0.1,label=TRUE,label.size=3)
+
+
+expro=read.table('df.txt',sep=" ",row.names=1,header=T,check.names=F,quote="!")
+expo2=expro[ ,-1]
+type=read.table('type.csv',sep=",",row.names=1,header=T,check.names=F,quote="!")
+
+#remove batch factor
+combat_edata_l=removeBatchEffect(as.matrix(log2(expo2+1)), type$batch)
+combat_FPKM2=t(combat_edata_l)
+#pca of raw count
+out_pca <- prcomp(combat_FPKM2[,-1])
+plot(out_pca,type="l")
+autoplot(out_pca,data=combat_FPKM2,colour=type$batch,size=0.1,label=TRUE,label.size=3)
+
+pdf('duibi.pdf')
+par(mfrow=c(1,2))
+boxplot(as.data.frame(expo2),main="Original",outline = FALSE)
+boxplot(as.data.frame(combat_edata_l),main="Batch corrected",outline = FALSE)
+dev.off()
+write.csv(combat_edata_l,'df_rm.csv')
