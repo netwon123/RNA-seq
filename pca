@@ -1,0 +1,34 @@
+df <- read.csv("FPKM.csv") #读入数据文件
+
+rownames(df) <- df$X
+df <- df[,c(2,3,4,5,6,7)]
+df <- df[rowSums(df) > 0, ]
+df_t=t(df)
+fpkm_matrix_std <- scale(df_t)
+
+# 运行PCA分析
+pca <- prcomp(fpkm_matrix_std)
+
+# 输出PCA结果
+summary(pca)
+# 提取PCA结果中的主成分
+pca_data <- data.frame(PC1=pca$x[,1], PC2=pca$x[,2])
+
+# 添加样本信息
+sample_info <- read.csv("trait.csv", header=T, row.names=1)
+pca_data_with_info <- cbind(pca_data, sample_info)
+
+# 绘制PCA图
+library(ggplot2)
+ggplot(pca_data_with_info, aes(x=PC1, y=PC2, color=pca_data_with_info$outcome)) + 
+  geom_point(size=3) + 
+  theme_bw() + 
+  labs(x="PC1", y="PC2")
+
+#-----improve--------
+library(factoextra)
+data.pca <- prcomp(df_t, scale. = T)
+group=c(rep("Control",3),rep("Test",3))
+fviz_pca_ind(data.pca, col.ind=group, mean.point=F, addEllipses = T, 
+             legend.title="Groups", ellipse.type="confidence", ellipse.level=0.9, palette = c("#CC3333", "#339999"))+
+  theme(panel.border = element_rect(fill=NA,color="black", size=1, linetype="solid"))
