@@ -28,3 +28,18 @@ resdata <-  merge(as.data.frame(res),as.data.frame(counts(dds,normalize=TRUE)),b
 
 
 write.csv(diff_gene_deseq2,file= "fh_x_def_padj0.01_fc2.csv")
+
+#heatmap of degene
+name <- read.csv("fh_x_def_padj0.01_fc2.csv") 
+rn=name[,1]
+
+pheatmap::pheatmap(df[rn,],
+                   fontsize = 8,
+                   show_colnames =T,
+                   show_rownames = F,
+                   cluster_cols = T,
+                
+                   width = 8,
+                   height = 6,
+                   angle_col=45)
+#----------pca
