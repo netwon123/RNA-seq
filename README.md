@@ -40,3 +40,6 @@ fr-firststrand。“1+-，1-+，2++，2--”这种，也就是read1在+链，相
 2-+: 这表示第二读序（read 2）的方向与参考基因组的负链方向相反
 
 # 链特异性数据 软件参数设置
+```
+https://rnabio.org/module-09-appendix/0009/12/01/StrandSettings/
+```
