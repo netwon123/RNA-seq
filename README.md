@@ -12,7 +12,17 @@ conda install -c bioconda rseqc
 ```
 infer_experiment.py -r genome.bed -i input.bam
 #singularity run ~/rseqc_4.0.0.sif infer_experiment.py -r genome.bed -i input.bam
+
 ```
+## bed get from gtf file:
+```
+wget -c http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/gtfToGenePred
+wget -c http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/genePredToBed
+chmod u+x gtfToGenePred genePredToBed
+gtfToGenePred genes.gtf genes.genePred
+genePredToBed genes.genePred genes.bed
+```
+
 # 结果判断
 ## 1. 反向链特异性测序 fr-firststrand 【理解为 reverse forward 】
 ```
