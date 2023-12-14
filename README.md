@@ -4,8 +4,10 @@
 2.rseqc工具判断
 
 # 安装
+(```)
 conda install -c bioconda rseqc  
 #singularity pull docker://clinicalgenomics/rseqc:4.0.0
+(```)
 # 运行
 infer_experiment.py -r genome.bed -i input.bam
 #singularity run ~/rseqc_4.0.0.sif infer_experiment.py -r genome.bed -i input.bam
