@@ -27,3 +27,19 @@ tpm <- t(t(rpk)/colSums(rpk) * 1000000)
 
 fpkm <- t(t(rpk)/colSums(df_count) * 10^6)
 write.table(fpkm,file= paste0(prefix, "_fpkm.xls"), quote=F, sep="\t", row.names=T, col.names=T )
+
+
+
+#-----------直接软件---------
+# FPKM quantification
+ls *sortedByCoord.out.bam | while read id;
+do
+stringtie -p 16 --fr -e -B -G /public/home/yiguoqiang/starGenome/Sus_scrofa.Sscrofa11.1.100.gtf -o ${id}_stringtie.gtf -A ${id}_stringtie.tsv $id
+done
+
+
+# Count quantification (genes)#加-f是在exon水平
+ls *sortedByCoord.out.bam | while read id;
+do
+featureCounts -T 16 -p -t exon -g gene_id -s 1 -a /public/home/yiguoqiang/starGenome/Sus_scrofa.Sscrofa11.1.100.gtf -o ${id}.featureCounts.txt $id
+done
