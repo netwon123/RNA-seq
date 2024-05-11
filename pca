@@ -18,6 +18,17 @@ pca_data <- data.frame(PC1=pca$x[,1], PC2=pca$x[,2])
 sample_info <- read.csv("trait.csv", header=T, row.names=1)
 pca_data_with_info <- cbind(pca_data, sample_info)
 
+#解释度
+variance_explained <- data.pca$sdev^2
+total_variance <- sum(variance_explained)
+pc1_explained <- variance_explained[1] / total_variance
+pc2_explained <- variance_explained[2] / total_variance
+
+# 打印解释度
+cat("PC1的解释度:", pc1_explained * 100, "%\n")
+cat("PC2的解释度:", pc2_explained * 100, "%\n")
+
+
 # 绘制PCA图
 library(ggplot2)
 ggplot(pca_data_with_info, aes(x=PC1, y=PC2, color=pca_data_with_info$outcome)) + 
