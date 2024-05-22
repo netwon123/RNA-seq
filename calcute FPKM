@@ -43,3 +43,14 @@ ls *sortedByCoord.out.bam | while read id;
 do
 featureCounts -T 16 -p -t exon -g gene_id -s 1 -a /public/home/yiguoqiang/starGenome/Sus_scrofa.Sscrofa11.1.100.gtf -o ${id}.featureCounts.txt $id
 done
+
+#merge tpm
+cd Expression
+for i in `cat ../Sample_name_List.txt`
+do
+awk '{print $1"\t"$NF}' "$i".tsv|sed '1d'|sort -k1,1>"$i".tpm
+echo -e "ID\t"$i""|cat - "$i".tpm >"$i".tpm.txt
+rm "$i".tpm
+done
+paste *.tpm.txt|awk '{printf("%s\t",$1);for(i=2;i<=NF;i+=2){printf("%s\t",$i)};print ""}'>All.gene.expression.tpm.txt
+cd ..
