@@ -68,4 +68,4 @@ awk '{print $1"\t"$8}' $i|sed '1d'|sort -k1,1>"$i".tpm
 echo -e "ID\t"$i""|cat - "$i".tpm >"$i".tpm.txt
 rm "$i".tpm
 done
-paste *.tpm.txt|awk '{printf("%s\t",$1);for(i=2;i<=NF;i+=2){printf("%s\t",$i)};print ""}'>All.gene.expression.tpm.txt
+paste *.tpm.txt|awk '{printf("%s\t",$1);for(i=2;i<=NF;i+=2){printf("%s\t",$i)};print ""}'>All.gene.expression.fpkm.txt
