@@ -45,6 +45,10 @@ featureCounts -T 16 -p -t exon -g gene_id -s 1 -a /public/home/yiguoqiang/starGe
 done
 
 #merge tpm
+①ls *tsv | while read id;do awk -F '\t' '{print $1,$9}' $id  |sed 's/ /\t/g' > ${id}.tpm;done
+python merge.py
+
+
 cd Expression
 for i in `cat ../Sample_name_List.txt`
 do
