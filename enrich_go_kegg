@@ -1,0 +1,53 @@
+# Load required libraries
+library(org.Mm.eg.db)
+library(clusterProfiler)
+setwd('G:/博士/mm10-qu/002_STEM_analysis/')
+
+# List all files in the current directory
+files <- list.files(pattern = "gene_")  # Adjust the pattern as needed
+
+# Loop through each file
+for (file in files) {
+  # Read gene expression data
+  gene <- read.table(file, header = FALSE)
+  gene_vector <- as.character(gene[[1]])
+  
+  # Convert gene identifiers to ENTREZID
+  trans <- bitr(gene_vector, fromType = "ENSEMBL", toType = "ENTREZID", OrgDb = org.Mm.eg.db)
+  
+  # Perform GO enrichment analysis
+  ego <- enrichGO(gene = trans$ENTREZID,
+                  OrgDb = org.Mm.eg.db,
+                  ont = "ALL",
+                  pAdjustMethod = "BH",
+                 
+                  qvalueCutoff = 0.05,
+                  readable = TRUE)
+  go_result_file2 <- paste0(gsub("\\.txt$", "", file), "_go.result.pdf")
+
+  #p1=barplot(ego) 
+  #ggsave(p1, file=go_result_file2)
+  # Write GO enrichment results to CSV
+  go_result_file <- paste0(gsub("\\.txt$", "", file), "_go.result.csv")
+  write.csv(ego@result, file = go_result_file, quote = FALSE, row.names = TRUE, col.names = TRUE)
+  
+  # Perform KEGG pathway enrichment analysis
+  kk <- enrichKEGG(gene = trans$ENTREZID,
+                   organism = 'mmu',
+                  
+                   qvalueCutoff = 0.05)
+  
+  # Convert KEGG results to readable format
+  kkx <- setReadable(kk, 'org.Mm.eg.db', 'ENTREZID')
+  
+  # Write KEGG enrichment results to CSV
+  kegg_result_file <- paste0(gsub("\\.txt$", "", file), "_kegg.result.csv")
+  write.csv(kkx, file = kegg_result_file, quote = FALSE, row.names = TRUE, col.names = TRUE)
+  kegg_result_file2 <- paste0(gsub("\\.txt$", "", file), "_kegg.result.pdf")
+
+  #p2=dotplot(kk)
+  #ggsave(p2, file=kegg_result_file2)
+  
+  # Print completion message for each file
+  cat("Enrichment analysis completed for", file, "\n")
+}
