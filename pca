@@ -43,3 +43,38 @@ group=c(rep("Control",3),rep("Test",3))
 fviz_pca_ind(data.pca, col.ind=group, mean.point=F, addEllipses = T, 
              legend.title="Groups", ellipse.type="confidence", ellipse.level=0.9, palette = c("#CC3333", "#339999"))+
   theme(panel.border = element_rect(fill=NA,color="black", size=1, linetype="solid"))
+
+
+
+#---
+setwd('G:/博士/泛基因组组/PGG-project/analysis/eqtl/01_sv_qtl/liver_eval/')
+library(factoextra)
+df=read.table('../span298.TPM_Liver.tsv',header = TRUE,row.names = 1)
+m.vars=apply(df,1,var)
+expro.upper=df[which(m.vars>quantile(m.vars, probs = seq(0, 1,
+                                                            0.25))[4]),]
+dim(expro.upper)
+
+
+data <- t(expro.upper)
+data.pca <- prcomp(data, scale. = T)  #对数据标准化后做PCA，这是后续作图的文件 
+summary(data.pca)  # 查看结果文件
+
+group=read.table('group-breed.txt',header = TRUE)
+value <- group$breed
+
+p1=fviz_pca_ind(data.pca, col.ind=value, 
+             mean.point=F,  # 去除分组的中心点
+             label = "none", # 隐藏样本标签
+             legend.title="Groups",
+             palette = c("#fc4307", "#00afbb",'#e7b800'))
+
+group2=read.table('group-sex.txt',header = TRUE)
+value2 <- group2$sex
+
+p2=fviz_pca_ind(data.pca, col.ind=value2, 
+                mean.point=F,  # 去除分组的中心点
+                label = "none", # 隐藏样本标签
+                legend.title="Groups",
+                palette = c("#fc4307", "#00afbb"))
+p1+p2
