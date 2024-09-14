@@ -1,0 +1,22 @@
+step1:
+download the cdna.FA 
+
+step2:
+#build the index
+./kallisto index -k 31 -i duroc simplified_output.fasta
+
+step3:
+ls ./*_1_clean.fq.gz | while read i;
+do
+i=${i/_1_clean.fq.gz/}
+~/SRWHS/kallisto/kallisto quant -i ~/SRWHS/kallisto/duroc -o ../kallisto_cecum/${i} -t 8 --rf-stranded  ${i}_1_clean.fq.gz -f ${i}_2_clean.fq.gz
+done
+
+step4:
+#convert the matrix to tpm\fpkm\count
+ ~/SRWHS/kallisto2matrix-1.0.3/kallisto2matrix -i k_muscle.txt -o kastolla_muscle
+
+
+##k_muscle.txt
+./BB313-01T0001_sfs/abundance.tsv,01T0001_sfs
+./BB313-01T0002_sfs/abundance.tsv,01T0002_sfs
