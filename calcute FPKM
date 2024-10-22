@@ -69,3 +69,10 @@ echo -e "ID\t"$i""|cat - "$i".tpm >"$i".tpm.txt
 rm "$i".tpm
 done
 paste *.tpm.txt|awk '{printf("%s\t",$1);for(i=2;i<=NF;i+=2){printf("%s\t",$i)};print ""}'>All.gene.expression.fpkm.txt
+
+#grep tissue 
+library(ggplot2)
+library(dplyr)
+dist=read.table('zAll.gene.expression.TPM.txt',header = TRUE,row.names = 1)
+liver_data <- dist[, grep("Liver", colnames(dist))]
+write.csv(liver_data,file='Liver_TPM.csv',quote=FALSE)
