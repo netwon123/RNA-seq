@@ -16,7 +16,12 @@ metadata <- data.frame(sample_id = colnames(df),
 
 
 dds <- DESeqDataSetFromMatrix(df,  metadata, design= ~ condition )
-head(dds)  #查
+#用factor
+dds$condition <- factor(dds$condition, levels = c("untreated", "treated"))
+#或者用relevel，直接指定参考level
+dds$condition <- relevel(dds$condition, ref = "untreated")
+
+
 dds <- DESeq(dds)
 resultsNames(dds)
 res <- results(dds,contrast = c("condition","case","control"))
