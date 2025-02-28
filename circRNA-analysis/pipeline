@@ -31,5 +31,17 @@ do
 CIRCexplorer2 parse -t STAR $id > ${id}_parse.log
 done
 
+
+#conda install bioconda::ucsc-gtftogenepred
+#https://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/
+wget https://link.zhihu.com/?target=http%3A//hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/gtfToGenePred
+gtfToGenePred input.gtf output.genePred
+
+#the genePred you got whitout the colnum of genename,so your should add it
+python  python extract_pairID.py
+#using function merge in R to merge genePred and pairID.txt
+
+
+
 #annotate
-ls *bed | while read id; do CIRCexplorer2 annotate -r ../../genome/Ovis_aries_rambouillet.ARS-UI_Ramb_v2.0.113.chr.gtf -g ../../genome/Ovis_aries_rambouillet.ARS-UI_Ramb_v2.0.dna.toplevel.fa -b $id -o ${id}_know.txt;done
+ls *bed | while read id; do CIRCexplorer2 annotate -r ../../genome/ovis.genePred.txt -g ../../genome/Ovis_aries_rambouillet.ARS-UI_Ramb_v2.0.dna.toplevel.fa -b $id -o ${id}_know.txt;done
