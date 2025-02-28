@@ -45,3 +45,18 @@ python  python extract_pairID.py
 
 #annotate
 ls *bed | while read id; do CIRCexplorer2 annotate -r ../../genome/ovis.genePred.txt -g ../../genome/Ovis_aries_rambouillet.ARS-UI_Ramb_v2.0.dna.toplevel.fa -b $id -o ${id}_know.txt;done
+
+#quant
+ls *_1_clean.fq.gz | while read i;
+do
+i=${i/_1_clean.fq.gz/}
+CIRIquant -t 16 \
+          -1 ${i}_1_clean.fq.gz \
+          -2 ${i}_2_clean.fq.gz \
+          --config /home/baoqi/rna/clean_fq/annotate/config.yml \
+          -o /home/baoqi/rna/clean_fq/quant \
+          -p ${i} \
+          --circ /home/baoqi/rna/clean_fq/annotate/${i}-STARChimeric.out.junction_back_spliced_junction.bed_know.txt \
+          --tool CIRCexplorer2
+done
+
