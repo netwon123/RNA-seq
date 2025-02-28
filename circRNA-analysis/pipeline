@@ -73,7 +73,16 @@ CASE4   SRR11348541.gtf T       4
 #get the expression file of circRNA
 prep_CIRIquant -i ../different_analysis/group_1Y_3Y.txt --lib library_info_1Y_3Y.csv --circ circRNA_info_1Y_3Y.csv --bsj circRNA_bsj_1Y_3Y.csv  --ratio circRNA_ratio_1Y_3Y.csv
 
-#get the expression file of Gene
+#get the expression file of Gene--group_3M_3Y.txt
+CONTROL1        SRR11348542_out.gtf
+CONTROL2        SRR11348543_out.gtf
+CONTROL3        SRR11348544_out.gtf
+CONTROL4        SRR11348545_out.gtf
+CASE1   SRR11348536_out.gtf
+CASE2   SRR11348537_out.gtf
+CASE3   SRR11348540_out.gtf
+CASE4   SRR11348541_out.gtf
+
 prepDE.py -i group_3M_3Y.txt -g gene_count_matrix_3M_3Y.csv -t transcript_count_matrix_3M_3Y.csv
 
 #different analysis
