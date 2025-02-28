@@ -28,8 +28,10 @@ done
 #identified ciroRNA
 ls *junction | while read id;
 do
-CIRCexplorer2 parse -t STAR $id > ${id}_parse.log
+CIRCexplorer2 parse -t STAR $id > ${id}_parse.log
+mv back_spliced_junction.bed ${id}_back_spliced_junction.bed
 done
+
 
 
 #conda install bioconda::ucsc-gtftogenepred
