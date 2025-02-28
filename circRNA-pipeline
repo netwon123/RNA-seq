@@ -1,0 +1,14 @@
+#QC
+fastqc -t 16 *.gz -o ./qc
+ls ./*fq.gz | while read i;
+do
+i=${i/_1.fq.gz/}
+fastp -w 56 -L -i ${i}_1.fq.gz -o ${i}_1_clean.fq.gz -I ${i}_2.fq.gz -O ${i}_2_clean.fq.gz
+done
+
+#bulid index
+STAR --runThreadN 56 --runMode genomeGenerate --genomeDir ./ \
+  --genomeFastaFiles Ovis_aries_rambouillet.ARS-UI_Ramb_v2.0.dna.toplevel.fa \
+  --sjdbGTFfile Ovis_aries_rambouillet.ARS-UI_Ramb_v2.0.113.chr.gtf
+
+#alignment
