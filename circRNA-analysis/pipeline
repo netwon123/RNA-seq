@@ -1,0 +1,32 @@
+#QC
+fastqc -t 16 *.gz -o ./qc
+ls ./*fq.gz | while read i;
+do
+i=${i/_1.fq.gz/}
+fastp -w 56 -L -i ${i}_1.fq.gz -o ${i}_1_clean.fq.gz -I ${i}_2.fq.gz -O ${i}_2_clean.fq.gz
+done
+
+#bulid index
+STAR --runThreadN 56 --runMode genomeGenerate --genomeDir ./ \
+  --genomeFastaFiles Ovis_aries_rambouillet.ARS-UI_Ramb_v2.0.dna.toplevel.fa \
+  --sjdbGTFfile Ovis_aries_rambouillet.ARS-UI_Ramb_v2.0.113.chr.gtf
+
+#alignment
+ls *_1_clean.fq.gz | while read i;
+do
+i=${i/_1_clean.fq.gz/}
+STAR --runThreadN 32 \
+--genomeDir /home/baoqi/rna/genome  \
+--chimSegmentMin  10 \
+--readFilesIn ${i}_1_clean.fq.gz ${i}_2_clean.fq.gz \
+--outFileNamePrefix ./${i}-STAR
+--outTmpDir tmp
+--readFilesCommand zcat
+--limitBAMsortRAM 120000000000
+done
+
+#identified ciroRNA
+ls *junction | while read id;
+do
+CIRCexplorer2 parse -t STAR $id > ${id}_parse.log
+done
