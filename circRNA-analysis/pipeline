@@ -58,5 +58,25 @@ CIRIquant -t 16 \
           -p ${i} \
           --circ /home/baoqi/rna/clean_fq/annotate/${i}-STARChimeric.out.junction_back_spliced_junction.bed_know.txt \
           --tool CIRCexplorer2
-done
+
+#prepare the samplelist
+#group_1Y_3Y.txt
+CONTROL1        SRR11348542.gtf C       1
+CONTROL2        SRR11348543.gtf C       2
+CONTROL3        SRR11348544.gtf C       3
+CONTROL4        SRR11348545.gtf C       4
+CASE1   SRR11348536.gtf T       1
+CASE2   SRR11348537.gtf T       2
+CASE3   SRR11348540.gtf T       3
+CASE4   SRR11348541.gtf T       4
+
+#get the expression file of circRNA
+prep_CIRIquant -i ../different_analysis/group_1Y_3Y.txt --lib library_info_1Y_3Y.csv --circ circRNA_info_1Y_3Y.csv --bsj circRNA_bsj_1Y_3Y.csv  --ratio circRNA_ratio_1Y_3Y.csv
+
+#get the expression file of Gene
+prepDE.py -i group_3M_3Y.txt -g gene_count_matrix_3M_3Y.csv -t transcript_count_matrix_3M_3Y.csv
+
+#different analysis
+CIRI_DE_replicate --lib ../01_expression_circRNA/library_info_3M_3Y.csv --bsj ../01_expression_circRNA/circRNA_bsj_3M_3Y.csv  --gene ../02_expression_gene/gene_count_matrix_3M_3Y.csv --out circRNA_DE_3M_3Y.tsv --out2 gene_DE_3M_3Y.tsv
+
 
