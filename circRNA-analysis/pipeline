@@ -30,3 +30,6 @@ ls *junction | while read id;
 do
 CIRCexplorer2 parse -t STAR $id > ${id}_parse.log
 done
+
+#annotate
+ls *bed | while read id; do CIRCexplorer2 annotate -r ../../genome/Ovis_aries_rambouillet.ARS-UI_Ramb_v2.0.113.chr.gtf -g ../../genome/Ovis_aries_rambouillet.ARS-UI_Ramb_v2.0.dna.toplevel.fa -b $id -o ${id}_know.txt;done
