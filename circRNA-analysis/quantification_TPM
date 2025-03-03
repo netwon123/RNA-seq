@@ -1,3 +1,3 @@
-根据每个circRNA的bsj reads数，计算其RPM值，即每百万条mapped reads中该circRNA的bsj reads数。 RPM = bsj reads数 / mapped reads数 * 1,000,000
-为了消除不同circRNA之间样本量和测序深度的差异，需要进行归一化处理。常用的归一化方法有TPM和FPKM，这里以TPM为例。 TPM是指Transcripts Per Million，即每百万条mapped reads中该circRNA的占比。
-TPM值的计算首先需要得到每个circRNA的长度（L），然后计算出该circRNA的标准化因子（F），最后用RPM值除以标准化因子F，再乘以1,000,000，即可得到该circRNA的TPM值。 F = ∑(RPM值 / L) TPM = RPM值 / F * 1,000,000
+#根据每个circRNA的bsj reads数，计算其RPM值，即每百万条mapped reads中该circRNA的bsj reads数。 RPM = bsj reads数 / mapped reads数 * 1,000,000
+#为了消除不同circRNA之间样本量和测序深度的差异，需要进行归一化处理。常用的归一化方法有TPM和FPKM，这里以TPM为例。 TPM是指Transcripts Per Million，即每百万条mapped reads中该circRNA的占比。
+#TPM值的计算首先需要得到每个circRNA的长度（L），然后计算出该circRNA的标准化因子（F），最后用RPM值除以标准化因子F，再乘以1,000,000，即可得到该circRNA的TPM值。 F = ∑(RPM值 / L) TPM = RPM值 / F * 1,000,000
