@@ -91,3 +91,5 @@ prepDE.py -i group_3M_3Y.txt -g gene_count_matrix_3M_3Y.csv -t transcript_count_
 CIRI_DE_replicate --lib ../01_expression_circRNA/library_info_3M_3Y.csv --bsj ../01_expression_circRNA/circRNA_bsj_3M_3Y.csv  --gene ../02_expression_gene/gene_count_matrix_3M_3Y.csv --out circRNA_DE_3M_3Y.tsv --out2 gene_DE_3M_3Y.tsv
 
 
+#get the TPM 
+python CIRIquant_gtf2TPMmatrix.py DIR/ matrix2
